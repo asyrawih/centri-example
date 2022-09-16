@@ -1,0 +1,34 @@
+{
+  "v3_use_offset": true,
+  "token_hmac_secret_key": "my_secret",
+  "api_key": "my_api_key",
+  "admin_password": "password",
+  "admin_secret": "secret",
+  "allowed_origins": [
+    "http://localhost:2000",
+    "http://localhost:3000"
+  ],
+  "admin": true,
+  "presence": true,
+  "history_size": 10,
+  "history_ttl": "30s",
+  "allow_subscribe_for_client": true,
+  "allow_subscribe_for_anonymous": true,
+  "allow_publish_for_subscriber": true,
+  "allow_publish_for_anonymous": true,
+  "allow_history_for_subscriber": true,
+  "allow_history_for_anonymous": true,
+  "allow_presence_for_subscriber": true,
+  "allow_presence_for_anonymous": true,
+  "namespaces": [
+    {
+      "name": "facts",
+      "history_size": 10,
+      "history_ttl": "300s",
+      "allow_subscribe_for_client": true
+    },
+    {
+      "name": "gossips"
+    }
+  ]
+}
