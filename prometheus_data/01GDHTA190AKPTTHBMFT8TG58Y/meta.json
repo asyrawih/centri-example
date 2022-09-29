@@ -1,0 +1,17 @@
+{
+	"ulid": "01GDHTA190AKPTTHBMFT8TG58Y",
+	"minTime": 1663812922420,
+	"maxTime": 1663819200000,
+	"stats": {
+		"numSamples": 5115,
+		"numSeries": 155,
+		"numChunks": 155
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01GDHTA190AKPTTHBMFT8TG58Y"
+		]
+	},
+	"version": 1
+}

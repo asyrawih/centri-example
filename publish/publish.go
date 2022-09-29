@@ -7,10 +7,12 @@ import (
 	"time"
 
 	"github.com/centrifugal/centrifuge-go"
+	"github.com/google/uuid"
 )
 
 type MessageData struct {
-	Message string
+	Id      string `json:"id"`
+	Message string `json:"message"`
 }
 
 func main() {
@@ -45,7 +47,7 @@ func main() {
 	}
 
 	pubMessage := func(text string) error {
-		message := &MessageData{Message: text}
+		message := &MessageData{Id: uuid.New().String(), Message: text}
 		data, _ := json.Marshal(message)
 		_, err := sub.Publish(context.Background(), data)
 		return err

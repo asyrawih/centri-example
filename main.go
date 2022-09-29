@@ -1,13 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/centrifugal/centrifuge-go"
 )
 
 type MessageData struct {
-	Message string
+	Id      string `json:"id"`
+	Message string `json:"message"`
 }
 
 // main function  
@@ -20,16 +22,17 @@ func main() {
 	client := centrifuge.NewJsonClient(
 		"ws://localhost:8000/connection/websocket",
 		centrifuge.Config{
-			Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbmRvZGF4IiwiZXhwIjoxNjYzOTA4NTY4LCJpYXQiOjE2NjMzMDM3Njh9.clYbRihfMRxATwYYSVw6ImRMbhi7L3mRAlw_Wcxj2gY",
+			Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYW5hbiIsImV4cCI6MTY2NDQzNjcyNiwiaWF0IjoxNjYzODMxOTI2fQ.3vslSFCCQy_2XObPjE2-dtqICV9h_PV6qhNCiSgBOgU",
 		})
 
 	defer client.Close()
 	// Listening event client try to connecting the server
-	client.OnConnecting(OnConnecting)
+	client.OnConnecting(func(ce centrifuge.ConnectingEvent) {})
 	// Listening event client try to connected the server
-	client.OnConnected(OnConnected)
+	client.OnConnected(func(ce centrifuge.ConnectedEvent) {
+	})
 	// Listening event client try to disconnected the server
-	client.OnDisconnected(OnDisconneted)
+	client.OnDisconnected(func(de centrifuge.DisconnectedEvent) {})
 
 	if err := client.Connect(); err != nil {
 		log.Printf("Error Happend %s", err)
@@ -39,20 +42,33 @@ func main() {
 	sub, err := client.NewSubscription(
 		"some",
 		centrifuge.SubscriptionConfig{
-			Recoverable: true,
-			JoinLeave:   true,
+			JoinLeave: true,
 		},
 	)
 
-	sub.OnJoin(OnJoin)
+	sub.OnJoin(func(je centrifuge.JoinEvent) {
+		log.Printf("%s", string(je.ConnInfo))
+	})
 
-	sub.OnLeave(OnLeave)
+	sub.OnLeave(func(le centrifuge.LeaveEvent) {
+		log.Printf("%s", string(le.ChanInfo))
+	})
 
-	sub.OnPublication(OnPublication)
+	sub.OnPublication(func(pe centrifuge.PublicationEvent) {
+		var message MessageData
+		if err := json.Unmarshal(pe.Data, &message); err != nil {
+			log.Printf("Error Happen On Publication : %s", err)
+		}
+		log.Printf("message:%s  id: %s", message.Message, message.Id)
+	})
 
-	sub.OnSubscribing(OnSubscribing)
+	sub.OnSubscribing(func(se centrifuge.SubscribingEvent) {
+		log.Printf("%s", se.Reason)
+	})
 
-	sub.OnSubscribed(OnSubscribed)
+	sub.OnSubscribed(func(se centrifuge.SubscribedEvent) {
+		log.Printf("%s", string(se.Data))
+	})
 
 	if err != nil {
 		log.Printf("Some Eror %s", err)
@@ -64,44 +80,4 @@ func main() {
 
 	select {}
 
-}
-
-// OnSubscribed function  
-func OnSubscribed(e centrifuge.SubscribedEvent) {
-	log.Printf("Client Has Subscribe, %s", e.Data)
-}
-
-// OnSubscribing function  
-func OnSubscribing(e centrifuge.SubscribingEvent) {
-	log.Printf("Client Has Subscribe, %s", e.Reason)
-}
-
-// OnJoin function  
-func OnJoin(je centrifuge.JoinEvent) {
-	log.Printf("Some Join %s", je.User)
-}
-
-// OnLeave function  
-func OnLeave(je centrifuge.LeaveEvent) {
-	log.Printf("Client Leave %s", je.ChanInfo)
-}
-
-// OnPublication function  
-func OnPublication(je centrifuge.PublicationEvent) {
-	log.Printf("%s | %s", string(je.Data), je.Info.User)
-}
-
-// OnConnecting function  
-func OnConnecting(ce centrifuge.ConnectingEvent) {
-	log.Printf("Connecting - %d (%s)", ce.Code, ce.Reason)
-}
-
-// OnConnected function  
-func OnConnected(ce centrifuge.ConnectedEvent) {
-	log.Printf("Connected - %s ", ce.ClientID)
-}
-
-// OnDisconneted function  
-func OnDisconneted(ce centrifuge.DisconnectedEvent) {
-	log.Printf("Disconnected - %d (%s)", ce.Code, ce.Reason)
 }

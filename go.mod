@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/centrifugal/centrifuge-go v0.9.3 // indirect
 	github.com/centrifugal/protocol v0.8.11 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
